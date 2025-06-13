@@ -17,8 +17,9 @@ Thumbs.db
 htmlcov/
 .tox/
 
-# === GIT INTERNE (de ton implémentation) ===
+# === GIT INTERNE ===
 .git/            # facultatif : seulement si tu veux ignorer ton propre .git interne
+
 
 # === FICHIERS DE CONFIGURATION PERSO ===
 .vscode/
@@ -29,3 +30,4 @@ htmlcov/
 *.bak
 *.orig
 *.lock
+.mygit
