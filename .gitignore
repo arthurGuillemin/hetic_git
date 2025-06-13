@@ -1,1 +1,35 @@
+
 venv
+# === ENVIRONNEMENT PYTHON ===
+env/
+.venv/
+__pycache__/
+*.py[cod]
+*.pyo
+
+# === FICHIERS TEMPORAIRES / OS ===
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+
+# === PYTEST & TEST CACHE ===
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# === GIT INTERNE ===
+.git/            # facultatif : seulement si tu veux ignorer ton propre .git interne
+
+
+# === FICHIERS DE CONFIGURATION PERSO ===
+.vscode/
+.idea/
+
+# === FICHIERS PRODUITS AUTOMATIQUEMENT ===
+*.swp
+*.bak
+*.orig
+*.lock
+.mygit
