@@ -8,6 +8,8 @@ from gitfs.commands import add
 from gitfs.commands import commit as commit_command
 from gitfs.core import get_git_dir, write_object
 from gitfs.index import read_index
+from gitfs.commands import checkout
+
 from gitfs.commands.ls_tree import ls_tree
 from gitfs.commands import rm
 from gitfs.commands import reset
@@ -172,6 +174,9 @@ def main():
     add_parser = subparsers.add_parser('add', help='Ajouter un fichier au staging area')
     add_parser.add_argument('file', help='Chemin du fichier à ajouter')
 
+    # Commande Checkout
+    checkout_parser = subparsers.add_parser('checkout', help='Changer ou créer une branche')
+    checkout_parser.add_argument('branch', help='Nom de la branche')
     # Commande rm
     rm_parser = subparsers.add_parser('rm', help='Supprimer un fichier du working directory et de l\'index')
     rm_parser.add_argument('file', help='Chemin du fichier à supprimer')
@@ -183,6 +188,7 @@ def main():
     reset_parser.add_argument('--hard', action='store_true', help='HEAD + index + fichiers')
 
     subparsers.add_parser('status', help='Afficher le statut du dépôt')
+
 
 
     # Commande commit-tree (bas niveau)
@@ -246,6 +252,9 @@ def main():
 
     elif args.command == 'add':
         add.add_file(args.file)
+
+    elif args.command == 'checkout':
+        checkout.checkout_branch(args.branch)
 
     elif args.command == 'commit-tree':
         git_dir = get_git_dir()
