@@ -7,7 +7,7 @@ import argparse
 from gitfs.commands import add
 from gitfs.commands import commit as commit_command
 from gitfs.core import get_git_dir, write_object
-
+from gitfs.index import read_index
 
 GIT_DIR_NAME = '.mygit' 
 def get_git_dir():
@@ -32,7 +32,7 @@ def init_repo():
 
 
 def write_object_local(sha1, data):
-    git_dir = get_git_dir_local()
+    git_dir = get_git_dir()
     obj_path = os.path.join(git_dir, 'objects', sha1[:2], sha1[2:])
     os.makedirs(os.path.dirname(obj_path), exist_ok=True)
 
@@ -151,21 +151,8 @@ def main():
     parser = argparse.ArgumentParser(description="Mini Git from Scratch – Python")
     subparsers = parser.add_subparsers(dest='command')
 
-    subparsers.add_parser('init', help='Initialiser un dépôt Git minimal')
 
-    commit_tree_parser = subparsers.add_parser('commit-tree', help='Créer un commit avec un tree')
-    commit_tree_parser.add_argument('tree_sha', help='SHA-1 de l’arbre')
-    commit_tree_parser.add_argument('-m', '--message', required=True, help='Message du commit')
-    commit_tree_parser.add_argument('-p', '--parent', help='SHA-1 du parent (facultatif)')
-
-    subparsers.add_parser('write-tree', help='Créer un objet tree à partir de l’index')
-
-    commit_parser = subparsers.add_parser('commit', help='Créer un commit à partir de l’index')
-    commit_parser.add_argument('-m', '--message', required=True, help='Message du commit')
-
-    subparsers.add_parser('status', help='Afficher les fichiers suivis / non suivis')
-    subparsers.add_parser('log', help='Afficher l’historique des commits')
-    subparsers.add_parser('show-ref', help='Afficher les références locales')
+   
     # Commande init
     subparsers.add_parser('init', help='Initialiser un dépôt Git minimal')
 
@@ -207,7 +194,7 @@ def main():
         add.add_file(args.file)
 
     elif args.command == 'commit-tree':
-        git_dir = get_git_dir_local()
+        git_dir = get_git_dir()
         if not os.path.isdir(git_dir):
             print("[ERR] Ce répertoire n'est pas un dépôt git. Lance d'abord `init`.")
             sys.exit(1)
