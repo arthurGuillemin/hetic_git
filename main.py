@@ -5,6 +5,8 @@ import hashlib
 import zlib
 import argparse
 
+from gitfs.commands.cat_file import cat_file
+
 GIT_DIR_NAME = '.mygit'  # Dossier de dépôt personnalisé pour éviter le conflit avec Git réel
 
 def get_git_dir():
@@ -85,6 +87,11 @@ def main():
     commit_parser.add_argument('-m', '--message', required=True, help='Message du commit')
     commit_parser.add_argument('-p', '--parent', help='SHA-1 du commit parent (facultatif)')
 
+    # Commande: cat-file
+    catfile_parser = subparsers.add_parser('cat-file', help='Afficher le type ou le contenu d\'un objet Git')
+    catfile_parser.add_argument('option', choices=['-t', '-p'], help='-t pour type, -p pour contenu')
+    catfile_parser.add_argument('oid', help='OID de l’objet Git')
+
     args = parser.parse_args()
 
     if args.command == 'init':
@@ -96,6 +103,13 @@ def main():
             print("[ERR] Erreur : ce répertoire n'est pas un dépôt git. Lance d'abord `init`.")
             sys.exit(1)
         create_commit(args.tree_sha, args.message, args.parent)
+
+    elif args.command == 'cat-file':
+        git_dir = get_git_dir()
+        if not os.path.isdir(git_dir):
+            print("[ERR] Ce répertoire n'est pas un dépôt git. Lance d'abord `init`.")
+            sys.exit(1)
+        cat_file([args.option, args.oid])
 
     else:
         parser.print_help()
