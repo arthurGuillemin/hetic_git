@@ -19,11 +19,4 @@ def read_file(sha1, git_dir=".git"):
     
     return content
 
-#    
-
-
-        # data = f.read()
-        # si - t:
-        #    return decode(data).split(" ")[0]
-        # si -p:
            

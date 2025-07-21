@@ -12,6 +12,7 @@ from gitfs.commands.ls_tree import ls_tree
 from gitfs.commands import rm
 from gitfs.commands import reset
 from gitfs.commands import rev_parse
+from gitfs.commands import ls_files
 
 
 from gitfs.commands.cat_file import cat_file
@@ -204,6 +205,8 @@ def main():
     lstree_parser.add_argument('tree_sha', help='SHA-1 de l’objet tree à inspecter')
 
 
+    subparsers.add_parser('ls-files', help='Lister les fichiers dans l\'index')
+
     args = parser.parse_args()
 
     if args.command == 'init':
@@ -253,11 +256,19 @@ def main():
         create_commit(args.tree_sha, args.message, args.parent)
         
     elif args.command == 'cat-file':
+
+            git_dir = get_git_dir()
+            if not os.path.isdir(git_dir):
+                print("[ERR] Ce répertoire n'est pas un dépôt git. Lance d'abord `init`.")
+                sys.exit(1)
+            cat_file([args.option, args.oid])
+    
+    elif args.command == 'ls-files':
         git_dir = get_git_dir()
         if not os.path.isdir(git_dir):
             print("[ERR] Ce répertoire n'est pas un dépôt git. Lance d'abord `init`.")
             sys.exit(1)
-        cat_file([args.option, args.oid])
+        ls_files.ls_files()
 
     elif args.command == 'ls-tree':
         ls_tree([args.tree_sha])
