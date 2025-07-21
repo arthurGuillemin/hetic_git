@@ -13,7 +13,12 @@ from gitfs.commands import reset
 from gitfs.commands import rev_parse
 
 
+from gitfs.commands.cat_file import cat_file
+
+
+
 GIT_DIR_NAME = '.mygit' 
+
 def get_git_dir():
     return os.path.abspath(os.path.join(os.path.dirname(__file__), GIT_DIR_NAME))
 
@@ -185,11 +190,7 @@ def main():
     # Commande commit (haut niveau)
     commit_parser = subparsers.add_parser('commit', help='Créer un commit depuis l\'index')
     commit_parser.add_argument('-m', '--message', required=True, help='Message du commit')
-    
-    subparsers.add_parser('log', help='Afficher l’historique des commits')
 
-    rev_parser = subparsers.add_parser('rev-parse', help='Résout une ref vers un SHA-1')
-    rev_parser.add_argument('ref', help='Ref à résoudre (HEAD, master, refs/heads/...)')
     args = parser.parse_args()
 
     if args.command == 'init':
@@ -237,13 +238,15 @@ def main():
             print("[ERR] Ce répertoire n'est pas un dépôt git. Lance d'abord `init`.")
             sys.exit(1)
         create_commit(args.tree_sha, args.message, args.parent)
-
-    elif args.command == 'commit':
+        
+   elif args.command == 'cat-file':
         git_dir = get_git_dir()
         if not os.path.isdir(git_dir):
             print("[ERR] Ce répertoire n'est pas un dépôt git. Lance d'abord `init`.")
             sys.exit(1)
-        commit_command.create_commit(args.message)
+        cat_file([args.option, args.oid])
+
+
 
     else:
         parser.print_help()
