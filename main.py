@@ -4,10 +4,15 @@ import time
 import hashlib
 import zlib
 import argparse
+from gitfs.commands import add
+from gitfs.commands import commit as commit_command
+from gitfs.core import get_git_dir, write_object
+
 
 GIT_DIR_NAME = '.mygit' 
 def get_git_dir():
     return os.path.abspath(os.path.join(os.path.dirname(__file__), GIT_DIR_NAME))
+
 
 def init_repo():
     git_dir = get_git_dir()
@@ -23,8 +28,11 @@ def init_repo():
 
     print(f"[OK] Dépôt initialisé dans {git_dir}")
 
-def write_object(sha1, data):
-    git_dir = get_git_dir()
+
+
+
+def write_object_local(sha1, data):
+    git_dir = get_git_dir_local()
     obj_path = os.path.join(git_dir, 'objects', sha1[:2], sha1[2:])
     os.makedirs(os.path.dirname(obj_path), exist_ok=True)
 
@@ -33,13 +41,6 @@ def write_object(sha1, data):
 
     print(f"[OK] Objet écrit dans : {GIT_DIR_NAME}/objects/{sha1[:2]}/{sha1[2:]}")
 
-def read_index():
-    index_path = os.path.join(get_git_dir(), "index")
-    if not os.path.exists(index_path):
-        return []
-    with open(index_path, "r") as f:
-        lines = f.readlines()
-    return [tuple(line.strip().split()) for line in lines if len(line.strip().split()) == 3]
 
 def write_tree():
     entries = read_index()
@@ -54,6 +55,7 @@ def write_tree():
     print(f"[INFO] SHA-1 du tree : {sha1}")
     print(sha1)
     return sha1
+
 
 def create_commit(tree_sha, message, parent_sha=None):
     lines = [f'tree {tree_sha}']
@@ -73,7 +75,9 @@ def create_commit(tree_sha, message, parent_sha=None):
     store = header + content
 
     sha1 = hashlib.sha1(store).hexdigest()
-    write_object(sha1, store)
+
+    write_object_local(sha1, store)
+
     print(f"[INFO] SHA-1 du commit : {sha1}")
     print(sha1)
     return sha1
@@ -142,6 +146,7 @@ def show_ref():
             sha = f.read().strip()
         print(f"{sha} refs/heads/{name}")
 
+
 def main():
     parser = argparse.ArgumentParser(description="Mini Git from Scratch – Python")
     subparsers = parser.add_subparsers(dest='command')
@@ -161,6 +166,22 @@ def main():
     subparsers.add_parser('status', help='Afficher les fichiers suivis / non suivis')
     subparsers.add_parser('log', help='Afficher l’historique des commits')
     subparsers.add_parser('show-ref', help='Afficher les références locales')
+    # Commande init
+    subparsers.add_parser('init', help='Initialiser un dépôt Git minimal')
+
+    # Commande add
+    add_parser = subparsers.add_parser('add', help='Ajouter un fichier au staging area')
+    add_parser.add_argument('file', help='Chemin du fichier à ajouter')
+
+    # Commande commit-tree (bas niveau)
+    commit_tree_parser = subparsers.add_parser('commit-tree', help='Créer un commit qui pointe vers un tree')
+    commit_tree_parser.add_argument('tree_sha', help='SHA-1 de l\'arbre (tree)')
+    commit_tree_parser.add_argument('-m', '--message', required=True, help='Message du commit')
+    commit_tree_parser.add_argument('-p', '--parent', help='SHA-1 du commit parent (facultatif)')
+
+    # Commande commit (haut niveau)
+    commit_parser = subparsers.add_parser('commit', help='Créer un commit depuis l\'index')
+    commit_parser.add_argument('-m', '--message', required=True, help='Message du commit')
 
     args = parser.parse_args()
 
@@ -181,8 +202,27 @@ def main():
         log()
     elif args.command == 'show-ref':
         show_ref()
+
+    elif args.command == 'add':
+        add.add_file(args.file)
+
+    elif args.command == 'commit-tree':
+        git_dir = get_git_dir_local()
+        if not os.path.isdir(git_dir):
+            print("[ERR] Ce répertoire n'est pas un dépôt git. Lance d'abord `init`.")
+            sys.exit(1)
+        create_commit(args.tree_sha, args.message, args.parent)
+
+    elif args.command == 'commit':
+        git_dir = get_git_dir()
+        if not os.path.isdir(git_dir):
+            print("[ERR] Ce répertoire n'est pas un dépôt git. Lance d'abord `init`.")
+            sys.exit(1)
+        commit_command.create_commit(args.message)
+
     else:
         parser.print_help()
+
 
 if __name__ == '__main__':
     main()
