@@ -8,6 +8,10 @@ from gitfs.commands import add
 from gitfs.commands import commit as commit_command
 from gitfs.core import get_git_dir, write_object
 from gitfs.index import read_index
+from gitfs.commands import rm
+from gitfs.commands import reset
+from gitfs.commands import rev_parse
+
 
 GIT_DIR_NAME = '.mygit' 
 def get_git_dir():
@@ -160,6 +164,18 @@ def main():
     add_parser = subparsers.add_parser('add', help='Ajouter un fichier au staging area')
     add_parser.add_argument('file', help='Chemin du fichier à ajouter')
 
+    # Commande rm
+    rm_parser = subparsers.add_parser('rm', help='Supprimer un fichier du working directory et de l\'index')
+    rm_parser.add_argument('file', help='Chemin du fichier à supprimer')
+    #reset
+    reset_parser = subparsers.add_parser('reset', help='Réinitialiser HEAD (et potentiellement index et working dir)')
+    reset_parser.add_argument('sha', help='SHA-1 du commit cible')
+    reset_parser.add_argument('--soft', action='store_true', help='Déplace HEAD seulement')
+    reset_parser.add_argument('--mixed', action='store_true', help='HEAD + index (défaut)')
+    reset_parser.add_argument('--hard', action='store_true', help='HEAD + index + fichiers')
+
+
+
     # Commande commit-tree (bas niveau)
     commit_tree_parser = subparsers.add_parser('commit-tree', help='Créer un commit qui pointe vers un tree')
     commit_tree_parser.add_argument('tree_sha', help='SHA-1 de l\'arbre (tree)')
@@ -169,7 +185,11 @@ def main():
     # Commande commit (haut niveau)
     commit_parser = subparsers.add_parser('commit', help='Créer un commit depuis l\'index')
     commit_parser.add_argument('-m', '--message', required=True, help='Message du commit')
+    
+    subparsers.add_parser('log', help='Afficher l’historique des commits')
 
+    rev_parser = subparsers.add_parser('rev-parse', help='Résout une ref vers un SHA-1')
+    rev_parser.add_argument('ref', help='Ref à résoudre (HEAD, master, refs/heads/...)')
     args = parser.parse_args()
 
     if args.command == 'init':
@@ -189,6 +209,24 @@ def main():
         log()
     elif args.command == 'show-ref':
         show_ref()
+    elif args.command == 'rm':
+        git_dir = get_git_dir()
+        if not os.path.isdir(git_dir):
+            print("[ERR] Ce répertoire n'est pas un dépôt git. Lance d'abord `init`.")
+            sys.exit(1)
+        rm.remove_file(args.file)
+    elif args.command == 'reset':
+        if args.soft:
+            mode = 'soft'
+        elif args.hard:
+            mode = 'hard'
+        else:
+            mode = 'mixed'
+        reset.reset(args.sha, mode)
+
+    elif args.command == 'rev-parse':
+        rev_parse.rev_parse(args.ref)
+
 
     elif args.command == 'add':
         add.add_file(args.file)
