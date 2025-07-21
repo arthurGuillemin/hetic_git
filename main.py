@@ -8,6 +8,7 @@ from gitfs.commands import add
 from gitfs.commands import commit as commit_command
 from gitfs.core import get_git_dir, write_object
 from gitfs.index import read_index
+from gitfs.commands import checkout
 
 GIT_DIR_NAME = '.mygit' 
 def get_git_dir():
@@ -160,6 +161,10 @@ def main():
     add_parser = subparsers.add_parser('add', help='Ajouter un fichier au staging area')
     add_parser.add_argument('file', help='Chemin du fichier à ajouter')
 
+    # Commande Checkout
+    checkout_parser = subparsers.add_parser('checkout', help='Changer ou créer une branche')
+    checkout_parser.add_argument('branch', help='Nom de la branche')
+
     # Commande commit-tree (bas niveau)
     commit_tree_parser = subparsers.add_parser('commit-tree', help='Créer un commit qui pointe vers un tree')
     commit_tree_parser.add_argument('tree_sha', help='SHA-1 de l\'arbre (tree)')
@@ -192,6 +197,9 @@ def main():
 
     elif args.command == 'add':
         add.add_file(args.file)
+
+    elif args.command == 'checkout':
+        checkout.checkout_branch(args.branch)
 
     elif args.command == 'commit-tree':
         git_dir = get_git_dir()
