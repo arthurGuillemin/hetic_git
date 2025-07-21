@@ -12,7 +12,7 @@ from gitfs.commands.ls_tree import ls_tree
 from gitfs.commands import rm
 from gitfs.commands import reset
 from gitfs.commands import rev_parse
-from gitfs.commands import ls_files
+from gitfs.commands import ls_file
 
 
 from gitfs.commands.cat_file import cat_file
@@ -194,7 +194,6 @@ def main():
     # Commande commit (haut niveau)
     commit_parser = subparsers.add_parser('commit', help='Créer un commit depuis l\'index')
     commit_parser.add_argument('-m', '--message', required=True, help='Message du commit')
-
     # Commande: cat-file
     catfile_parser = subparsers.add_parser('cat-file', help='Afficher le type ou le contenu d\'un objet Git')
     catfile_parser.add_argument('option', choices=['-t', '-p'], help='-t pour type, -p pour contenu')
@@ -204,8 +203,8 @@ def main():
     lstree_parser = subparsers.add_parser('ls-tree', help='Lister les entrées d’un objet tree')
     lstree_parser.add_argument('tree_sha', help='SHA-1 de l’objet tree à inspecter')
 
-
-    subparsers.add_parser('ls-files', help='Lister les fichiers dans l\'index')
+    # Commande ls-files
+    subparsers.add_parser('ls_files', help='Lister les fichiers dans l\'index')
 
     args = parser.parse_args()
 
@@ -256,19 +255,18 @@ def main():
         create_commit(args.tree_sha, args.message, args.parent)
         
     elif args.command == 'cat-file':
-
             git_dir = get_git_dir()
             if not os.path.isdir(git_dir):
                 print("[ERR] Ce répertoire n'est pas un dépôt git. Lance d'abord `init`.")
                 sys.exit(1)
             cat_file([args.option, args.oid])
     
-    elif args.command == 'ls-files':
+    elif args.command == 'ls_files':
         git_dir = get_git_dir()
         if not os.path.isdir(git_dir):
             print("[ERR] Ce répertoire n'est pas un dépôt git. Lance d'abord `init`.")
             sys.exit(1)
-        ls_files.ls_files()
+        ls_file.ls_files()
 
     elif args.command == 'ls-tree':
         ls_tree([args.tree_sha])

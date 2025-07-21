@@ -17,16 +17,28 @@ def read_index():
                 entries[path] = sha1
     return entries
 
+import os
+from gitfs.core import get_git_dir
+
 def write_index(entries):
     """
-    Écrit le dictionnaire {filename: sha1} dans .mygit/index
+    Écrit les entrées dans .mygit/index au format :
+    mode filename sha1
     """
-    index_path = get_index_path()
-    with open(index_path, 'w') as f:
-        for path, sha1 in entries.items():
-            f.write(f"{sha1} {path}\n")
+    index_path = os.path.join(get_git_dir(), "index")
+    with open(index_path, "w") as f:
+        for mode, filename, sha1 in entries:
+            f.write(f"{mode} {filename} {sha1}\n")
 
-def add_to_index(sha1, path):
+from gitfs.utils.indexs import read_index, write_index
+
+def add_to_index(mode, filename, sha1):
+    """
+    Ajoute une entrée (mode, filename, sha1) à l'index.
+    Remplace l'entrée existante si elle existe déjà.
+    """
     entries = read_index()
-    entries[path] = sha1
+    entries = [e for e in entries if e[1] != filename]
+    entries.append((mode, filename, sha1))
     write_index(entries)
+

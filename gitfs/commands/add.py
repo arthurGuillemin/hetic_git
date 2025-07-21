@@ -18,6 +18,11 @@ def add_file(file_path):
     sha1 = hashlib.sha1(store).hexdigest()
     write_object(sha1, store)
 
-    # Enregistrer dans l'index via fonction dédiée
-    add_to_index(sha1, file_path)
-    print(f"[OK] Fichier ajouté au staging : {file_path}")
+    mode = "100644"
+
+    filename = os.path.basename(file_path)
+
+    add_to_index(mode, filename, sha1)
+
+    print(f"[OK] Objet écrit dans : .mygit/objects/{sha1[:2]}/{sha1[2:]}")
+    print(f"[OK] Fichier ajouté au staging : {filename}")
