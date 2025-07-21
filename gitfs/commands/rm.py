@@ -9,8 +9,11 @@ def remove_file(file_path):
     print("[DEBUG] Contenu de l'index :", entries)
     print("[DEBUG] Chemin à supprimer :", file_path)
 
+    normalized_keys = {}
+    for k in entries.keys():
+        filename = os.path.normpath(k.split()[0])
+        normalized_keys[filename] = k
 
-    normalized_keys = {os.path.normpath(k): k for k in entries.keys()}
     if file_path not in normalized_keys:
         print(f"[WARN] Le fichier '{file_path}' n'est pas dans l'index.")
         return
@@ -26,4 +29,3 @@ def remove_file(file_path):
 
     write_index(entries)
     print(f"[OK] '{file_path}' supprimé de l'index.")
-
