@@ -239,12 +239,12 @@ def main():
             sys.exit(1)
         create_commit(args.tree_sha, args.message, args.parent)
         
-   elif args.command == 'cat-file':
-        git_dir = get_git_dir()
-        if not os.path.isdir(git_dir):
-            print("[ERR] Ce répertoire n'est pas un dépôt git. Lance d'abord `init`.")
-            sys.exit(1)
-        cat_file([args.option, args.oid])
+    elif args.command == 'cat-file':
+            git_dir = get_git_dir()
+            if not os.path.isdir(git_dir):
+                print("[ERR] Ce répertoire n'est pas un dépôt git. Lance d'abord `init`.")
+                sys.exit(1)
+            cat_file([args.option, args.oid])
 
 
 
