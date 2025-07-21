@@ -11,6 +11,7 @@ from gitfs.index import read_index
 from gitfs.commands import rm
 from gitfs.commands import reset
 from gitfs.commands import rev_parse
+from gitfs.commands import ls_files
 
 
 from gitfs.commands.cat_file import cat_file
@@ -191,6 +192,8 @@ def main():
     commit_parser = subparsers.add_parser('commit', help='Créer un commit depuis l\'index')
     commit_parser.add_argument('-m', '--message', required=True, help='Message du commit')
 
+    subparsers.add_parser('ls-files', help='Lister les fichiers dans l\'index')
+
     args = parser.parse_args()
 
     if args.command == 'init':
@@ -245,6 +248,13 @@ def main():
                 print("[ERR] Ce répertoire n'est pas un dépôt git. Lance d'abord `init`.")
                 sys.exit(1)
             cat_file([args.option, args.oid])
+    
+    elif args.command == 'ls-files':
+    git_dir = get_git_dir()
+    if not os.path.isdir(git_dir):
+        print("[ERR] Ce répertoire n'est pas un dépôt git. Lance d'abord `init`.")
+        sys.exit(1)
+    ls_files.ls_files()
 
 
 
