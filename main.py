@@ -10,7 +10,19 @@ from gitfs.core import get_git_dir, write_object
 from gitfs.index import read_index
 from gitfs.commands import checkout
 
+from gitfs.commands.ls_tree import ls_tree
+from gitfs.commands import rm
+from gitfs.commands import reset
+from gitfs.commands import rev_parse
+from gitfs.commands import ls_files
+
+
+from gitfs.commands.cat_file import cat_file
+
+
+
 GIT_DIR_NAME = '.mygit' 
+
 def get_git_dir():
     return os.path.abspath(os.path.join(os.path.dirname(__file__), GIT_DIR_NAME))
 
@@ -152,6 +164,7 @@ def main():
     parser = argparse.ArgumentParser(description="Mini Git from Scratch – Python")
     subparsers = parser.add_subparsers(dest='command')
 
+    subparsers.add_parser('write-tree', help='Créer un objet tree à partir de l\'index')
 
    
     # Commande init
@@ -164,6 +177,19 @@ def main():
     # Commande Checkout
     checkout_parser = subparsers.add_parser('checkout', help='Changer ou créer une branche')
     checkout_parser.add_argument('branch', help='Nom de la branche')
+    # Commande rm
+    rm_parser = subparsers.add_parser('rm', help='Supprimer un fichier du working directory et de l\'index')
+    rm_parser.add_argument('file', help='Chemin du fichier à supprimer')
+    #reset
+    reset_parser = subparsers.add_parser('reset', help='Réinitialiser HEAD (et potentiellement index et working dir)')
+    reset_parser.add_argument('sha', help='SHA-1 du commit cible')
+    reset_parser.add_argument('--soft', action='store_true', help='Déplace HEAD seulement')
+    reset_parser.add_argument('--mixed', action='store_true', help='HEAD + index (défaut)')
+    reset_parser.add_argument('--hard', action='store_true', help='HEAD + index + fichiers')
+
+    subparsers.add_parser('status', help='Afficher le statut du dépôt')
+
+
 
     # Commande commit-tree (bas niveau)
     commit_tree_parser = subparsers.add_parser('commit-tree', help='Créer un commit qui pointe vers un tree')
@@ -174,6 +200,18 @@ def main():
     # Commande commit (haut niveau)
     commit_parser = subparsers.add_parser('commit', help='Créer un commit depuis l\'index')
     commit_parser.add_argument('-m', '--message', required=True, help='Message du commit')
+
+    # Commande: cat-file
+    catfile_parser = subparsers.add_parser('cat-file', help='Afficher le type ou le contenu d\'un objet Git')
+    catfile_parser.add_argument('option', choices=['-t', '-p'], help='-t pour type, -p pour contenu')
+    catfile_parser.add_argument('oid', help='OID de l’objet Git')
+
+    # Commande: ls-tree
+    lstree_parser = subparsers.add_parser('ls-tree', help='Lister les entrées d’un objet tree')
+    lstree_parser.add_argument('tree_sha', help='SHA-1 de l’objet tree à inspecter')
+
+
+    subparsers.add_parser('ls-files', help='Lister les fichiers dans l\'index')
 
     args = parser.parse_args()
 
@@ -194,6 +232,24 @@ def main():
         log()
     elif args.command == 'show-ref':
         show_ref()
+    elif args.command == 'rm':
+        git_dir = get_git_dir()
+        if not os.path.isdir(git_dir):
+            print("[ERR] Ce répertoire n'est pas un dépôt git. Lance d'abord `init`.")
+            sys.exit(1)
+        rm.remove_file(args.file)
+    elif args.command == 'reset':
+        if args.soft:
+            mode = 'soft'
+        elif args.hard:
+            mode = 'hard'
+        else:
+            mode = 'mixed'
+        reset.reset(args.sha, mode)
+
+    elif args.command == 'rev-parse':
+        rev_parse.rev_parse(args.ref)
+
 
     elif args.command == 'add':
         add.add_file(args.file)
@@ -207,13 +263,25 @@ def main():
             print("[ERR] Ce répertoire n'est pas un dépôt git. Lance d'abord `init`.")
             sys.exit(1)
         create_commit(args.tree_sha, args.message, args.parent)
+        
+    elif args.command == 'cat-file':
 
-    elif args.command == 'commit':
+            git_dir = get_git_dir()
+            if not os.path.isdir(git_dir):
+                print("[ERR] Ce répertoire n'est pas un dépôt git. Lance d'abord `init`.")
+                sys.exit(1)
+            cat_file([args.option, args.oid])
+    
+    elif args.command == 'ls-files':
         git_dir = get_git_dir()
         if not os.path.isdir(git_dir):
             print("[ERR] Ce répertoire n'est pas un dépôt git. Lance d'abord `init`.")
             sys.exit(1)
-        commit_command.create_commit(args.message)
+        ls_files.ls_files()
+
+    elif args.command == 'ls-tree':
+        ls_tree([args.tree_sha])
+
 
     else:
         parser.print_help()
