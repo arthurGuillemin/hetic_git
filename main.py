@@ -9,7 +9,13 @@ from gitfs.commands import commit as commit_command
 from gitfs.core import get_git_dir, write_object
 from gitfs.index import read_index
 
+from gitfs.commands.cat_file import cat_file
+
+GIT_DIR_NAME = '.mygit'  # Dossier de dépôt personnalisé pour éviter le conflit avec Git réel
+
+
 GIT_DIR_NAME = '.mygit' 
+
 def get_git_dir():
     return os.path.abspath(os.path.join(os.path.dirname(__file__), GIT_DIR_NAME))
 
@@ -170,6 +176,11 @@ def main():
     commit_parser = subparsers.add_parser('commit', help='Créer un commit depuis l\'index')
     commit_parser.add_argument('-m', '--message', required=True, help='Message du commit')
 
+    # Commande: cat-file
+    catfile_parser = subparsers.add_parser('cat-file', help='Afficher le type ou le contenu d\'un objet Git')
+    catfile_parser.add_argument('option', choices=['-t', '-p'], help='-t pour type, -p pour contenu')
+    catfile_parser.add_argument('oid', help='OID de l’objet Git')
+
     args = parser.parse_args()
 
     if args.command == 'init':
@@ -199,13 +210,15 @@ def main():
             print("[ERR] Ce répertoire n'est pas un dépôt git. Lance d'abord `init`.")
             sys.exit(1)
         create_commit(args.tree_sha, args.message, args.parent)
-
-    elif args.command == 'commit':
+        
+   elif args.command == 'cat-file':
         git_dir = get_git_dir()
         if not os.path.isdir(git_dir):
             print("[ERR] Ce répertoire n'est pas un dépôt git. Lance d'abord `init`.")
             sys.exit(1)
-        commit_command.create_commit(args.message)
+        cat_file([args.option, args.oid])
+
+
 
     else:
         parser.print_help()
