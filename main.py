@@ -160,6 +160,7 @@ def main():
     parser = argparse.ArgumentParser(description="Mini Git from Scratch – Python")
     subparsers = parser.add_subparsers(dest='command')
 
+    subparsers.add_parser('write-tree', help='Créer un objet tree à partir de l\'index')
 
    
     # Commande init
@@ -179,6 +180,7 @@ def main():
     reset_parser.add_argument('--mixed', action='store_true', help='HEAD + index (défaut)')
     reset_parser.add_argument('--hard', action='store_true', help='HEAD + index + fichiers')
 
+    subparsers.add_parser('status', help='Afficher le statut du dépôt')
 
 
     # Commande commit-tree (bas niveau)
