@@ -6,15 +6,15 @@ def get_index_path():
 
 def read_index():
     """
-    Lit le fichier .mygit/index et retourne un dictionnaire {filename: sha1}
+    Lit le fichier .mygit/index et retourne une liste de tuples (mode, filename, sha1)
     """
     index_path = get_index_path()
-    entries = {}
+    entries = []
     if os.path.exists(index_path):
         with open(index_path, 'r') as f:
             for line in f:
-                sha1, path = line.strip().split(' ', 1)
-                entries[path] = sha1
+                mode, filename, sha1 = line.strip().split(' ', 2)
+                entries.append((mode, filename, sha1))
     return entries
 
 import os
