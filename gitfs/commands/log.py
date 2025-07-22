@@ -3,12 +3,12 @@ import zlib
 from gitfs.main import get_git_dir
 
 def log():
-    head_path = os.path.join(get_git_dir(), 'refs', 'heads', 'master')
-    if not os.path.exists(head_path):
-        print("[WARN] Aucun commit")
+    ref_path = os.path.join(get_git_dir(), 'refs', 'heads', 'master')
+    if not os.path.exists(ref_path):
+        print("[WARN] Aucun commit trouvé.")
         return
 
-    current = open(head_path).read().strip()
+    current = open(ref_path).read().strip()
     objects_path = os.path.join(get_git_dir(), 'objects')
 
     while current:

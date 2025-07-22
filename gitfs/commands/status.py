@@ -1,6 +1,6 @@
 import os
 import hashlib
-from index import read_index
+from gitfs.utils.indexs import read_index
 
 def file_sha1(path):
     with open(path, "rb") as f:
@@ -15,17 +15,14 @@ def status():
 
     print("[INFO] Fichiers ajoutés (staged) :")
     for f in sorted(index_entries):
-        # Vérifie si le fichier existe et s'il est modifié
         if f in working_files:
             current_sha = file_sha1(f)
             if current_sha == index_entries[f]:
-                print(f"  ➕ {f}")  # staged et non modifié
+                print(f"  ➕ {f}")  
             else:
-                print(f"  ✏️ {f} (modifié depuis staging)")  # staged mais modifié
+                print(f"  ✏️ {f} (modifié depuis staging)")  
         else:
             print(f"  ❌ {f} (supprimé depuis staging)")
-
-    # Fichiers non suivis : dans le dossier mais pas dans l'index
     unstaged = working_files - set(index_entries.keys())
     if unstaged:
         print("[INFO] Fichiers non suivis :")

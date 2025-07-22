@@ -21,20 +21,15 @@ def read_index():
     return entries
 
 def write_tree():
-    """
-    Construit un objet tree à partir de l’index .mygit/index, l’écrit dans objects/, et retourne son SHA-1
-    """
     entries = read_index()
-    if not entries:
-        print("[INFO] Aucun fichier dans l’index.")
-        return None
-
     tree_content = b""
     for mode, filename, sha1 in sorted(entries, key=lambda x: x[1]):
         entry = f"{mode} {filename}".encode() + b"\0" + bytes.fromhex(sha1)
         tree_content += entry
-
-    oid = write_object(tree_content, "tree")
-    print(f"[OK] Objet écrit dans : .mygit/objects/{oid[:2]}/{oid[2:]}")
-    print(f"[INFO] SHA-1 du tree : {oid}")
-    return oid
+    header = f"tree {len(tree_content)}\0".encode()
+    full_data = header + tree_content
+    sha1 = hashlib.sha1(full_data).hexdigest()
+    write_object(sha1, full_data)
+    print(f"[INFO] SHA-1 du tree : {sha1}")
+    print(sha1)
+    return sha1
