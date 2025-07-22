@@ -1,0 +1,2 @@
+[console_scripts]
+mygit = gitfs.main:main

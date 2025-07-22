@@ -1,6 +1,6 @@
 import os
 import zlib
-from main import get_git_dir
+from gitfs.main import get_git_dir
 
 def log():
     head_path = os.path.join(get_git_dir(), 'refs', 'heads', 'master')
