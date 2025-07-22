@@ -7,7 +7,7 @@ import argparse
 from gitfs.commands import add
 from gitfs.commands import commit as commit_command
 from gitfs.core import get_git_dir, write_object
-from gitfs.index import read_index
+from gitfs.utils.index import read_index
 from gitfs.commands import checkout
 from gitfs.commands import status
 from gitfs.commands.ls_tree import ls_tree

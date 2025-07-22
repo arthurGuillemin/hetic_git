@@ -1,6 +1,6 @@
 import os
 import hashlib
-from gitfs.utils.indexs import read_index
+from gitfs.utils.index import read_index
 
 def file_sha1(path):
     with open(path, "rb") as f:

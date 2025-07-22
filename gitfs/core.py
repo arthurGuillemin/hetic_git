@@ -1,4 +1,3 @@
-# core.py
 import os
 import hashlib
 import zlib
@@ -6,8 +5,7 @@ import zlib
 GIT_DIR_NAME = '.mygit'
 
 def get_git_dir():
-    git_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', GIT_DIR_NAME))
-    return os.path.normpath(git_dir)
+    return os.path.abspath(os.path.join(os.getcwd(), GIT_DIR_NAME))  # <- nouvelle version propre
 
 def write_object(sha1, data):
     git_dir = get_git_dir()

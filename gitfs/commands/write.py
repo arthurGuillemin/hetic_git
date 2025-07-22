@@ -1,6 +1,6 @@
 import os
 import hashlib
-from gitfs.main import get_git_dir, write_object
+from gitfs.core import get_git_dir, write_object
 
 def read_index():
     """

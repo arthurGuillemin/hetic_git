@@ -2,7 +2,7 @@ import os
 import hashlib
 
 from ..core import get_git_dir, write_object
-from gitfs.utils.indexs import add_to_index
+from gitfs.utils.index import add_to_index
 
 def add_file(file_path):
     if not os.path.isfile(file_path):

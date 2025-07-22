@@ -1,7 +1,7 @@
 import os
 import zlib
 import hashlib
-from gitfs.index import write_index
+from gitfs.utils.index import write_index
 from gitfs.core import get_git_dir
 from gitfs.utils import read_object  
 

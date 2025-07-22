@@ -2,7 +2,6 @@ README.md
 setup.py
 gitfs/__init__.py
 gitfs/core.py
-gitfs/index.py
 gitfs/main.py
 gitfs/refs.py
 gitfs/commands/__init__.py
@@ -10,17 +9,19 @@ gitfs/commands/add.py
 gitfs/commands/cat_file.py
 gitfs/commands/checkout.py
 gitfs/commands/commit.py
+gitfs/commands/init.py
 gitfs/commands/log.py
 gitfs/commands/ls_file.py
 gitfs/commands/ls_tree.py
 gitfs/commands/reset.py
 gitfs/commands/rev_parse.py
 gitfs/commands/rm.py
-gitfs/commands/show-ref.py
+gitfs/commands/show.py
 gitfs/commands/status.py
-gitfs/commands/write-tree.py
+gitfs/commands/write.py
 gitfs/utils/__init__.py
-gitfs/utils/indexs.py
+gitfs/utils/create_commit_object.py
+gitfs/utils/index.py
 gitfs/utils/read_file.py
 gitfs/utils/read_object copy.py
 gitfs/utils/read_object.py

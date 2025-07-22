@@ -30,7 +30,7 @@ def write_index(entries):
         for mode, filename, sha1 in entries:
             f.write(f"{mode} {filename} {sha1}\n")
 
-from gitfs.utils.indexs import read_index, write_index
+from gitfs.utils.index import read_index, write_index
 
 def add_to_index(mode, filename, sha1):
     """

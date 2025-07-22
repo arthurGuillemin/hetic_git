@@ -1,5 +1,5 @@
 import os
-from gitfs.utils.indexs import read_index, write_index
+from gitfs.utils.index import read_index, write_index
 from gitfs.core import get_git_dir
 
 def remove_file(file_path):
