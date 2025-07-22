@@ -57,6 +57,12 @@ def write_object_local(sha1, data):
 
 def write_tree():
     entries = read_index()
+    if not entries:
+        print("[INFO] Aucun fichier dans l’index.")
+        return None
+
+    print(f"[DEBUG] Entrées dans l'index : {entries}")
+
     tree_content = b""
     for mode, filename, sha1 in sorted(entries, key=lambda x: x[1]):
         entry = f"{mode} {filename}".encode() + b"\0" + bytes.fromhex(sha1)
@@ -65,10 +71,9 @@ def write_tree():
     full_data = header + tree_content
     sha1 = hashlib.sha1(full_data).hexdigest()
     write_object(sha1, full_data)
+    print(f"[OK] Objet écrit dans : .mygit/objects/{sha1[:2]}/{sha1[2:]}")
     print(f"[INFO] SHA-1 du tree : {sha1}")
-    print(sha1)
     return sha1
-
 
 def create_commit(tree_sha, message, parent_sha=None):
     lines = [f'tree {tree_sha}']

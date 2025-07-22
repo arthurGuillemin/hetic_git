@@ -1,40 +1,28 @@
-import sys
 from gitfs.utils.read_object import read_object
 
 def ls_tree(args):
     if len(args) != 1:
-        print("Usage: git ls-tree <tree_sha>", file=sys.stderr)
-        sys.exit(1)
+        print("Usage: git ls-tree <tree-sha>")
+        return
 
-    tree_sha = args[0]
+    oid = args[0]
 
-    try:
-        obj_type, content = read_object(tree_sha)
-    except Exception as e:
-        print(f"[ERR] Impossible de lire l'objet {tree_sha} : {e}")
-        sys.exit(1)
+    obj_type, content = read_object(oid)
 
     if obj_type != "tree":
-        print(f"[ERR] {tree_sha} n'est pas un objet tree.")
-        sys.exit(1)
+        print(f"[ERR] {oid} n'est pas un objet tree.")
+        return
 
     i = 0
     while i < len(content):
-        try:
-            space = content.index(b' ', i)
-            mode = content[i:space].decode()
+        space_index = content.find(b' ', i)
+        mode = content[i:space_index].decode()
 
-            null_byte = content.index(b'\x00', space)
-            name = content[space + 1:null_byte].decode()
+        null_index = content.find(b'\x00', space_index)
+        filename = content[space_index+1:null_index].decode()
 
-            sha_bin = content[null_byte + 1:null_byte + 21]
-            sha = sha_bin.hex()
+        sha1 = content[null_index+1:null_index+21].hex()
 
-            pointed_type, _ = read_object(sha)
+        print(f"{mode} {sha1} {filename}")
 
-            print(f"{mode} {pointed_type} {sha}\t{name}")
-
-            i = null_byte + 21
-        except Exception as e:
-            print(f"[ERR] Erreur de parsing dans le tree : {e}")
-            break
+        i = null_index + 21
