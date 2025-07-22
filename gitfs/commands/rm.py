@@ -10,16 +10,16 @@ def remove_file(file_path):
     print("[DEBUG] Chemin à supprimer :", file_path)
 
     normalized_keys = {}
-    for k in entries.keys():
-        filename = os.path.normpath(k.split()[0])
-        normalized_keys[filename] = k
+    for entry in entries:
+        filename = os.path.normpath(entry[1])
+        normalized_keys[filename] = entry
 
     if file_path not in normalized_keys:
         print(f"[WARN] Le fichier '{file_path}' n'est pas dans l'index.")
         return
 
     key_to_remove = normalized_keys[file_path]
-    del entries[key_to_remove]
+    entries.remove(key_to_remove)
 
     if os.path.exists(file_path):
         os.remove(file_path)
