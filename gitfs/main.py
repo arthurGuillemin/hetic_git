@@ -15,7 +15,7 @@ from gitfs.commands import rm
 from gitfs.commands import reset
 from gitfs.commands import rev_parse
 from gitfs.commands import ls_file
-from gitfs.commands import write
+from gitfs.commands.write import write_tree
 from gitfs.commands.cat_file import cat_file
 from gitfs.commands import log
 from gitfs.commands import show
@@ -67,7 +67,7 @@ def create_commit(tree_sha, message, parent_sha=None):
     return sha1
 
 def simple_commit(message):
-    tree_sha = write()
+    tree_sha = write_tree()
     head_path = os.path.join(get_git_dir(), 'HEAD')
     ref_path = os.path.join(get_git_dir(), 'refs', 'heads', 'master')
     parent_sha = None
@@ -77,6 +77,8 @@ def simple_commit(message):
             parent_sha = f.read().strip()
 
     commit_sha = create_commit(tree_sha, message, parent_sha)
+
+    os.makedirs(os.path.dirname(ref_path), exist_ok=True)
 
     with open(ref_path, "w") as f:
         f.write(commit_sha)
@@ -158,7 +160,7 @@ def main():
             sys.exit(1)
         create_commit(args.tree_sha, args.message, args.parent)
     elif args.command == 'write-tree':
-        write.write_tree()
+        write_tree()
     elif args.command == 'commit':
         simple_commit(args.message)
     elif args.command == 'status':

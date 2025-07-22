@@ -1,10 +1,11 @@
 import os
 
-GIT_DIR_NAME = '.mygit' 
-
+GIT_DIR_NAME = '.mygit'
 
 def get_git_dir():
-    return os.path.abspath(os.path.join(os.path.dirname(__file__), GIT_DIR_NAME))
+    # Remonte d'un niveau, puis ajoute .mygit
+    root = os.path.dirname(os.getcwd())  # Parent du cwd
+    return os.path.join(root, GIT_DIR_NAME)
 
 def init_repo():
     git_dir = get_git_dir()
@@ -19,4 +20,3 @@ def init_repo():
         f.write('ref: refs/heads/master\n')
 
     print(f"[OK] Dépôt initialisé dans {git_dir}")
-
