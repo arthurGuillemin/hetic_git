@@ -189,8 +189,6 @@ def main():
 
     subparsers.add_parser('status', help='Afficher le statut du dépôt')
 
-
-
     # Commande commit-tree (bas niveau)
     commit_tree_parser = subparsers.add_parser('commit-tree', help='Créer un commit qui pointe vers un tree')
     commit_tree_parser.add_argument('tree_sha', help='SHA-1 de l\'arbre (tree)')
@@ -211,6 +209,17 @@ def main():
 
     # Commande ls-files
     subparsers.add_parser('ls_files', help='Lister les fichiers dans l\'index')
+
+    # Commande log
+    subparsers.add_parser('log', help='Afficher l\'historique des commits')
+    
+    # Commande show-ref
+    subparsers.add_parser('show-ref', help='Afficher les références et leurs SHA-1')
+    
+    # Commande rev-parse
+    revparse_parser = subparsers.add_parser('rev-parse', help='Résoudre une référence en SHA-1')
+    revparse_parser.add_argument('ref', help='Référence à résoudre (HEAD, master, refs/heads/master, etc.)')
+
 
     args = parser.parse_args()
 
