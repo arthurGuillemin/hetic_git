@@ -200,7 +200,9 @@ def main():
     commit_parser.add_argument('-m', '--message', required=True, help='Message du commit')
     # Commande: cat-file
     catfile_parser = subparsers.add_parser('cat-file', help='Afficher le type ou le contenu d\'un objet Git')
-    catfile_parser.add_argument('option', choices=['-t', '-p'], help='-t pour type, -p pour contenu')
+    group = catfile_parser.add_mutually_exclusive_group(required=True)
+    group.add_argument('-t', action='store_true', help='Afficher le type de l’objet')
+    group.add_argument('-p', action='store_true', help='Afficher le contenu de l’objet')
     catfile_parser.add_argument('oid', help='OID de l’objet Git')
 
     # Commande: ls-tree
@@ -273,11 +275,10 @@ def main():
         create_commit(args.tree_sha, args.message, args.parent)
         
     elif args.command == 'cat-file':
-            git_dir = get_git_dir()
-            if not os.path.isdir(git_dir):
-                print("[ERR] Ce répertoire n'est pas un dépôt git. Lance d'abord `init`.")
-                sys.exit(1)
-            cat_file([args.option, args.oid])
+        if args.t:
+            cat_file(['-t', args.oid])
+        elif args.p:
+            cat_file(['-p', args.oid])
     
     elif args.command == 'ls_files':
         git_dir = get_git_dir()
