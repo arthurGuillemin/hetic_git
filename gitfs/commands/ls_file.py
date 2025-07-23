@@ -11,8 +11,10 @@ def ls_files():
         with open(index_path, 'r') as f:
             files = []
             for line in f:
-                sha1, filename = line.strip().split(' ', 1)
-                files.append(filename)
+                parts = line.strip().split(' ', 2)
+                if len(parts) == 3:
+                    _, filename, _ = parts
+                    files.append(filename)
         for filename in sorted(files):
             print(filename)
     except Exception as e:
