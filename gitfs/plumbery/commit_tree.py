@@ -1,53 +1,34 @@
 import os
-import sys
 import hashlib
 import zlib
-import time
+from gitfs.core import get_git_dir, write_object
 
-def create_commit(tree_sha, message, parent_sha=None):
-    lines = [f'tree {tree_sha}']
-    
-    if parent_sha:
-        lines.append(f'parent {parent_sha}')
+def create_tree_from_index():
+    git_dir = get_git_dir()
+    index_path = os.path.join(git_dir, 'index')
 
-    timestamp = int(time.time())
-    timezone = '+0000'
-    author = f'Example User <example@example.com> {timestamp} {timezone}'
+    if not os.path.exists(index_path):
+        print("[ERR] Aucun fichier index trouvé.")
+        return None
 
-    lines.append(f'author {author}')
-    lines.append(f'committer {author}')
-    lines.append('')
-    lines.append(message)
+    entries = []
+    with open(index_path, 'r') as index_file:
+        for line in index_file:
+            sha1, filepath = line.strip().split(' ', 1)
+            entries.append((filepath, sha1))
 
-    content = '\n'.join(lines).encode()
-    header = f'commit {len(content)}\0'.encode()
+    tree_entries = []
+    for filepath, sha1 in entries:
+        mode = '100644'  # fichier classique (non-exécutable)
+        tree_entries.append(f'{mode} {filepath}\0'.encode() + bytes.fromhex(sha1))
+
+    # Encodage final
+    content = b''.join(tree_entries)
+    header = f'tree {len(content)}\0'.encode()
     store = header + content
 
-    sha1 = hashlib.sha1(store).hexdigest()
-    obj_path = os.path.join('.git', 'objects', sha1[:2], sha1[2:])
+    tree_sha1 = hashlib.sha1(store).hexdigest()
+    write_object(tree_sha1, store)
 
-    os.makedirs(os.path.dirname(obj_path), exist_ok=True)
-
-    with open(obj_path, 'wb') as f:
-        f.write(zlib.compress(store))
-
-    print(sha1)
-
-
-if __name__ == "__main__":
-    if not os.path.isdir('.git'):
-        print("Error: Repository manquant (missing .git directory)")
-        sys.exit(1)
-
-    if len(sys.argv) < 4 or sys.argv[2] != "-m":
-        print("Usage: python commit_tree.py <tree_sha> -m \"message\" [-p <parent_sha>]")
-        sys.exit(1)
-
-    tree_sha = sys.argv[1]
-    message = sys.argv[3]
-    parent_sha = None
-
-    if len(sys.argv) > 5 and sys.argv[4] == "-p":
-        parent_sha = sys.argv[5]
-
-    create_commit(tree_sha, message, parent_sha)
+    print(f"[OK] Arbre (tree) créé : {tree_sha1}")
+    return tree_sha1
