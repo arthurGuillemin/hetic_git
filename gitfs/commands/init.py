@@ -2,13 +2,10 @@ import os
 
 GIT_DIR_NAME = '.mygit'
 
-def get_git_dir():
-    # Remonte d'un niveau, puis ajoute .mygit
-    root = os.path.dirname(os.getcwd())  # Parent du cwd
-    return os.path.join(root, GIT_DIR_NAME)
-
 def init_repo():
-    git_dir = get_git_dir()
+    current_dir = os.getcwd()
+    git_dir = os.path.join(current_dir, GIT_DIR_NAME)
+
     if os.path.exists(git_dir):
         print("[ATT] Le dépôt .mygit existe déjà.")
         return

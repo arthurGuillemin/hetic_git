@@ -22,10 +22,6 @@ from gitfs.commands import show
 from gitfs.commands import init
 GIT_DIR_NAME = '.mygit' 
 
-def get_git_dir():
-    return os.path.abspath(os.path.join(os.path.dirname(__file__), GIT_DIR_NAME))
-
-
 
 
 
