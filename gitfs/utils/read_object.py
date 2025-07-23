@@ -14,7 +14,6 @@ def read_object(oid):
     null_index = decompressed.index(b'\x00')
     header = decompressed[:null_index].decode()
     type_, _ = header.split(' ', 1)
-    content = decompressed[null_index + 1:]
 
-    return type_, content
+    return type_
 
